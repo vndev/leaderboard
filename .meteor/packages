@@ -22,3 +22,10 @@ webpack:webpack
 webpack:react
 webpack:less
 react-meteor-data
+webpack:json
+webpack:html
+webpack:markdown
+webpack:jade
+webpack:assets
+aldeed:collection2
+chrismbeckett:toastr

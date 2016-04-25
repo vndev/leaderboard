@@ -3,23 +3,57 @@ import ReactDOM from 'react-dom'
 import { createContainer } from 'meteor/react-meteor-data';
 import Task from './Task.jsx';
 import User from './User.jsx';
- import { Tasks } from '../api/tasks.js';
- import { Users } from '../api/users.js';
+import { Tasks } from '../api/tasks.js';
+import UsersCollection from '../api/users.js';
+import {Meteor} from 'meteor/meteor'
+import Github from 'github-api'
 // App component - represents the whole app
 class App extends Component {
+  constructor(props){
+    super(props)
+    this.github = new Github({
+      token:Meteor.settings.public.githubToken,
+      auth: 'oauth'
+    });
+    
+  }
   handleSubmit(event) {
     event.preventDefault();
  
     // Find the text field via the React ref
-    const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
- 
-    Users.insert({
-      username: text,
-      createdAt: new Date(), // current time
+    const username = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
+    let currentUser = UsersCollection.findOne({username:username})
+    var userApi = this.github.getUser();
+    userApi.show(username, (err, user) => {
+      if(user){
+        userApi.userRepos(username, (err, repos) => {
+          Meteor.call('calculateScoreGithub', user, repos, (err, score) => {
+            console.log(score)
+            if(currentUser){
+              let updateData = currentUser
+              updateData.github = user
+              updateData.score = score.total
+              updateData.languages = score.languages
+              updateData.updatedAt = new Date()
+              Meteor.call('updateUser', updateData)
+              toastr.success('Update successful')
+            }else{
+              UsersCollection.insert({
+                username: username,
+                github: user,
+                score: score.total,
+                languages: score.languages,
+                createdAt: new Date(), // current time
+              });
+              toastr.success('Insert successful')
+            }})  
+        })
+        
+        // Clear form    
+       ReactDOM.findDOMNode(this.refs.textInput).value = '';
+      }
+      
     });
- 
-    // Clear form
-    ReactDOM.findDOMNode(this.refs.textInput).value = '';
   }
  
   renderTasks() {
@@ -28,8 +62,8 @@ class App extends Component {
     ));
   }
   renderUsers() {
-    return this.props.users.map((user) => (
-      <User key={user._id} user={user} />
+    return this.props.users.map((user, index) => (
+      <User key={user._id} user={user} order={index+1}/>
     ));
   }
  
@@ -63,6 +97,6 @@ App.propTypes = {
 export default createContainer(() => {
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
-    users: Users.find({}, { sort: { createdAt: -1 } }).fetch(),
+    users: UsersCollection.find({}, { sort: { score: -1 } }).fetch(),
   };
 }, App);

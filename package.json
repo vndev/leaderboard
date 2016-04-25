@@ -7,6 +7,7 @@
   "main": "server/main.js",
   "browser": "client/main.js",
   "dependencies": {
+    "github-api": "^0.11.2",
     "meteor-node-stubs": "~0.2.0",
     "react": "^15.0.1",
     "react-addons-pure-render-mixin": "^15.0.1",
@@ -34,6 +35,10 @@
     "react-transform-catch-errors": "^1.0.0",
     "redbox-react": "^1.2.0",
     "less-loader": "^2.2.2",
-    "less": "^2.3.1"
+    "less": "^2.3.1",
+    "json-loader": "^0.5.4",
+    "html-loader": "^0.4.0",
+    "markdown-loader": "^0.1.7",
+    "jade-loader": "^0.8.0"
   }
 }
