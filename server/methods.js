@@ -71,7 +71,7 @@ let scoreRepo = function(gRepo){
     score += (gRepo.stargazers_count*15) // you forked, but many people starred, it's great
     // score watchers_count
     score += (gRepo.watchers_count*10) // you forked, but many people starred, it's great
-    langScore = 100 + gRepo.stargazers_count*5 // you forked, but many people starred, it's great
+    langScore = 100 + gRepo.stargazers_count*5 + gRepo.forks_count%100 // you forked, but many people starred, it's great
   }else{
     score += 100
     // score forks count
