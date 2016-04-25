@@ -15,7 +15,29 @@ class App extends Component {
       token:Meteor.settings.public.githubToken,
       auth: 'oauth'
     });
-    
+    this.updateDatabase = this.updateDatabase.bind(this)
+  }
+  updateDatabase(user, repos, currentUser){
+    Meteor.call('calculateScoreGithub', user, repos, (err, score) => {
+        if(currentUser){
+          let updateData = currentUser
+          updateData.github = user
+          updateData.score = score.total
+          updateData.languages = score.languages
+          updateData.updatedAt = new Date()
+          Meteor.call('updateUser', updateData)
+          toastr.success('Update successful')
+        }else{
+          UsersCollection.insert({
+            username: username,
+            github: user,
+            score: score.total,
+            languages: score.languages,
+            createdAt: new Date(), // current time
+          });
+          toastr.success('Insert successful')
+        }
+      })
   }
   handleSubmit(event) {
     event.preventDefault();
@@ -24,32 +46,20 @@ class App extends Component {
     const username = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
     let currentUser = UsersCollection.findOne({username:username})
     var userApi = this.github.getUser();
+    let repos;
     userApi.show(username, (err, user) => {
       if(user){
-        userApi.userRepos(username, (err, repos) => {
-          Meteor.call('calculateScoreGithub', user, repos, (err, score) => {
-            console.log(score)
-            if(currentUser){
-              let updateData = currentUser
-              updateData.github = user
-              updateData.score = score.total
-              updateData.languages = score.languages
-              updateData.updatedAt = new Date()
-              Meteor.call('updateUser', updateData)
-              toastr.success('Update successful')
-            }else{
-              UsersCollection.insert({
-                username: username,
-                github: user,
-                score: score.total,
-                languages: score.languages,
-                createdAt: new Date(), // current time
-              });
-              toastr.success('Insert successful')
-            }})  
-        })
-        
-        // Clear form    
+        if(user.type == 'Organization'){
+           userApi.orgRepos(username, (err, repos) => {
+             if(!err)
+               this.updateDatabase(user, repos, currentUser)
+          });
+        }else{
+          userApi.userRepos(username, (err, repos) => {  
+            if(!err)
+              this.updateDatabase(user, repos, currentUser)
+          });  
+        }// Clear form    
        ReactDOM.findDOMNode(this.refs.textInput).value = '';
       }
       
