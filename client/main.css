@@ -18,10 +18,10 @@ body {
 }
 
 .container {
-  max-width: 600px;
   margin: 0 auto;
   min-height: 100%;
   background: white;
+  padding-left: 256px;
 }
 
 header {

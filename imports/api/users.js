@@ -141,6 +141,6 @@ export const userSchema = new SimpleSchema({
     optional: true
   }
 })
-let UsersCollection = new Mongo.Collection('users');
+let UsersCollection = new Mongo.Collection('git');
 UsersCollection.attachSchema(userSchema)
 export default UsersCollection

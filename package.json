@@ -8,10 +8,15 @@
   "browser": "client/main.js",
   "dependencies": {
     "github-api": "^0.11.2",
+    "material-ui": "^0.14.4",
     "meteor-node-stubs": "~0.2.0",
     "react": "^15.0.1",
     "react-addons-pure-render-mixin": "^15.0.1",
-    "react-dom": "^15.0.1"
+    "react-dom": "^15.0.1",
+    "react-komposer": "^1.8.0",
+    "react-mounter": "^1.2.0",
+    "react-router": "^2.4.0",
+    "react-tap-event-plugin": "^1.0.0"
   },
   "devDependencies": {
     "webpack": "^1.12.14",

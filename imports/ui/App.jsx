@@ -7,6 +7,15 @@ import { Tasks } from '../api/tasks.js';
 import UsersCollection from '../api/users.js';
 import {Meteor} from 'meteor/meteor'
 import Github from 'github-api'
+import injectTapEventPlugin from 'react-tap-event-plugin';
+ import LeftNav from 'material-ui/lib/left-nav';
+import MenuItem from 'material-ui/lib/menus/menu-item';
+import RaisedButton from 'material-ui/lib/raised-button';
+
+import AppBar from 'material-ui/lib/app-bar';
+// Needed for onTouchTap 
+// http://stackoverflow.com/a/34015469/988941 
+injectTapEventPlugin();
 // App component - represents the whole app
 class App extends Component {
   constructor(props){
@@ -79,7 +88,18 @@ class App extends Component {
  
   render() {
     return (
+      <div>
+        <AppBar
+    title="Title"
+    iconClassNameRight="muidocs-icon-navigation-expand-more"
+  />
+        <LeftNav open={true}>
+          <MenuItem>Menu Item</MenuItem>
+          <MenuItem>Menu Item 2</MenuItem>
+        </LeftNav>
+      
       <div className="container">
+      
         <header>
           <h1>User List</h1>
           
@@ -95,6 +115,7 @@ class App extends Component {
         <ul>
           {this.renderUsers()}
         </ul>
+        </div>
       </div>
     );
   }
