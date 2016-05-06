@@ -50,16 +50,32 @@ class App extends Component {
       })
   }
   searchUsers(searchApi, q, per_page = 100, page = 1) {
-    let users = []
     searchApi.users({q:q, per_page, page}, (err, res)=>{
       if(!err && res && res.total_count){
-        users.concat(res.items)
-        if(res.incomplete_results == false){
-          users.concat(this.searchUsers(searchApi, q, per_page, (page + 1)))
-        }
+       var userApi = this.github.getUser();
+       res.items.forEach((item) => {
+         
+        userApi.show(item.login, (err, user) => {
+            if(user){
+              let currentUser = UsersCollection.findOne({username:user.login})
+              let repos;
+              if(user.type == 'Organization'){
+                userApi.orgRepos(item.login, (err, repos) => {
+                  if(!err)
+                    this.updateDatabase(user, repos, currentUser)
+                });
+              }else{
+                userApi.userRepos(item.login, (err, repos) => {  
+                  if(!err)
+                    this.updateDatabase(user, repos, currentUser)
+                });  
+              }// Clear form    
+            }
+            
+          }); 
+       })
       }
     })
-    return users
     
   }
   handleSubmit(event) {
@@ -69,7 +85,7 @@ class App extends Component {
     const username = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
     let currentUser = UsersCollection.findOne({username:username})
     var userApi = this.github.getUser();
-    console.log(this.searchUsers(this.github.getSearch(), 'nguyễn'))
+    this.searchUsers(this.github.getSearch(), 'nguyễn')
     let repos;
     userApi.show(username, (err, user) => {
       if(user){
