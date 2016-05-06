@@ -27,4 +27,4 @@ webpack:jade
 webpack:assets
 aldeed:collection2
 chrismbeckett:toastr
-kadira:flow-router-ssr
+promise

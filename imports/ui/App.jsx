@@ -25,6 +25,7 @@ class App extends Component {
       auth: 'oauth'
     });
     this.updateDatabase = this.updateDatabase.bind(this)
+    this.searchUsers = this.searchUsers.bind(this)
   }
   updateDatabase(user, repos, currentUser){
     Meteor.call('calculateScoreGithub', user, repos, (err, score) => {
@@ -48,6 +49,19 @@ class App extends Component {
         }
       })
   }
+  searchUsers(searchApi, q, per_page = 100, page = 1) {
+    let users = []
+    searchApi.users({q:q, per_page, page}, (err, res)=>{
+      if(!err && res && res.total_count){
+        users.concat(res.items)
+        if(res.incomplete_results == false){
+          users.concat(this.searchUsers(searchApi, q, per_page, (page + 1)))
+        }
+      }
+    })
+    return users
+    
+  }
   handleSubmit(event) {
     event.preventDefault();
  
@@ -55,6 +69,7 @@ class App extends Component {
     const username = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
     let currentUser = UsersCollection.findOne({username:username})
     var userApi = this.github.getUser();
+    console.log(this.searchUsers(this.github.getSearch(), 'nguyễn'))
     let repos;
     userApi.show(username, (err, user) => {
       if(user){

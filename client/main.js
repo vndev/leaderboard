@@ -1,11 +1,21 @@
 import React from 'react';
+
+import { Router, Route, browserHistory } from 'react-router';
+
 import { Meteor } from 'meteor/meteor';
 import { render } from 'react-dom';
  
 import App from '../imports/ui/App.jsx';
-import {mount} from 'react-mounter'; 
+
+export const renderRoutes = () => (
+  <Router history={browserHistory}>
+    <Route path="/aa" component={App}>
+      
+    </Route>
+  </Router>
+); 
 Meteor.startup(() => {
-  render(<App />, document.getElementById('render-target'));
+  render(renderRoutes(), document.getElementById('render-target'));
   toastr.options = {
     "closeButton": false,
     "debug": false,
